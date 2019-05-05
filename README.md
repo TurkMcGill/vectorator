@@ -22,6 +22,8 @@ You will notice that some lines of dialogue have words enclosed in curly braces.
 
 The other words in curly brackets: "{good}", "{weird}", "{interesting}" and "{scary}" get randomly replaced with synonyms in order to add some more randomness. You can ONLY use: good, weird, interesting, and scary. I haven't tested it much but you should be able to use more than one in a line of dialogue, though be aware that if you use "{scary}" twice it will pick the same word both times.
 
+IMPORTANT NOTE: My program picks lines of dialogue with biased random numbers. The first few lines will get repeated a LOT, while other lines won't get said nearly as often. If there are 10 lines of dialogue, the odds of Vector saying #10 is less than 1%. So if you write your own dialogue for Vector, be sure to put the generic lines in the beginning.
+
 ### Add Your Own Jokes! ###
 Like the dialogue.csv file, my program downloads "jokes.txt" from my website, but you can have a local copy and Vectorator will use that instead. The file is here: http://cuttergames.com/vector/jokes.txt 
 
