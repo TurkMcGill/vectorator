@@ -1,7 +1,8 @@
 # vectorator
 
 IMPORTANT: In order for Vector to read the news you will need to install feedparser. This command should do the trick:
-     py -3 -m pip install feedparser
+
+py -3 -m pip install feedparser
 
 *Quick disclaimers... I'm new to the Vector SDK, new to Python, new to github. If I'm doing something wrong, or if you see problems in my code, please let me know! Also, Vectorator is likely buggy and I haven't finished fine-tuning the timings -- though you can tweak these as much as you like by downloading and editing the dialogue.csv file. Instructions below.*
 
