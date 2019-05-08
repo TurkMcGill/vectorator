@@ -2,7 +2,7 @@
 
 IMPORTANT: In order for Vector to read the news you will need to install feedparser. This command should do the trick:
 
-py -3 -m pip install feedparser
+ 'pip install feedparser' (though some installed it using: 'py -3 -m pip install feedparser')
 
 Also, you MUST be using the latest version of the SDK. There are installation notes here:
 https://forums.anki.com/t/vector-sdk-v0-6-0-alpha-release-notes-april-30-2019/33455
