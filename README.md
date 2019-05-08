@@ -4,6 +4,10 @@ IMPORTANT: In order for Vector to read the news you will need to install feedpar
 
 py -3 -m pip install feedparser
 
+Also, you MUST be using the latest version of the SDK. There are installation notes here:
+https://forums.anki.com/t/vector-sdk-v0-6-0-alpha-release-notes-april-30-2019/33455
+
+
 *Quick disclaimers... I'm new to the Vector SDK, new to Python, new to github. If I'm doing something wrong, or if you see problems in my code, please let me know! Also, Vectorator is likely buggy and I haven't finished fine-tuning the timings -- though you can tweak these as much as you like by downloading and editing the dialogue.csv file. Instructions below.*
 
 I wanted to add more actions/reactions to Vector, but without Anki's tools this would be extremely difficult and time-consuming. Much easier, is making Vector talk! So that is the origins of my new program. (Vector + orator = Vectorator). I have written hundreds of lines of random dialogue, and edited nearly a thousand joke and "fact of the day" files. In addition, every morning Vector will tell you the news and your local weather! (You have to enter your city and region names in the config.py file.)
