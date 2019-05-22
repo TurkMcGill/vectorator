@@ -1,7 +1,7 @@
 # vectorator
 
 ### Important Installation Instructions ###
-1. Update (May 10, 2019): I seem to be having some trouble with my webhost. Someone at Bluehost is working on the problem and it should be fixed soon. As a workaround, you can follow the instructions below and download dialogue.csv, jokes.txt, and facts.txt to the same folder as vectorator.py. 
+1. Update (May 22, 2019): I believe my issue with Bluehost has been resolved. So the program should work again WITHOUT having local copies of the .csv and .txt files. 
 
 2. In order for Vector to read the news you will need to install feedparser. This command should do the trick:
 
