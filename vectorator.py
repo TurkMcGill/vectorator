@@ -171,6 +171,7 @@ def vector_react(arg):
     if arg != "news_intro": print("Vector is trying to react to: ", arg)
 
 
+
     if (datetime.now() - ts["wake_word"]).total_seconds() < 15: # If Vector was listening, don't react for a little while
         print("Wake word timeout")
         return
@@ -180,7 +181,7 @@ def vector_react(arg):
     if arg == "pass": # This adds a bit of controllable randomness to some of the random dialogues (jokes, telling the time, etc.)
         print("Instead of attempting a random comment, I chose to pass this time...")
         return
-    
+
     now = datetime.now()
     if arg not in ts:
         ts[arg] = now - timedelta(seconds = 100) # Fixes problem for new installs where Vector thinks everything JUST happened
