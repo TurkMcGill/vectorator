@@ -1,0 +1,260 @@
+NAME,LINES,INT_LOW,INT_HIGH,NORMAL
+last_saw_face,1,0,0,NA
+random_weather,1,300,1200,NA
+wake_word,1,5,5,NA
+,,,,
+greeting,3,5,5,Welcome to vect orator 0.73.
+,,,,"Okay, I am ready."
+,,,,Hello world. I am ready.
+,,,,
+cliff,10,10,20,Wow 
+,,,,That was {scary}.
+,,,,"Well, that was a little {scary}."
+,,,,That was super scary {name}.
+,,,,I thought I was going to fall.
+,,,,I'm sure glad that I didn't fall {name}.
+,,,,"Wow {name}, that was very scary."
+,,,,"Holy smokes, I was was very scared."
+,,,,I thought I was going to fall.
+,,,,"Holy smokes, that was kind of intense."
+,,,,
+drop,5,5,30,That hurt
+,,,,Help!
+,,,,Help me!
+,,,,Ouch
+,,,,I've fallen and I can't get up!
+,,,,
+touched,15,10,15,That feels {good}.
+,,,,That feels very {good}.
+,,,,"{name}, I like that."
+,,,,That really feels {good}.
+,,,,Thank you {name} that's {good}.
+,,,,That feels SO {good}.
+,,,,Oh that feels {good}.
+,,,,You are very good at that {name}.
+,,,,"Oh {name}, you have soft hands."
+,,,,That feels really {good}.
+,,,,I LIKE to be petted.
+,,,,Ooh don't stop {name}.
+,,,,That's very {good}. Thank you.
+,,,,You have soft hands.
+,,,,You are my favorite human.
+,,,,
+picked_up,15,30,60,Don't drop me.
+,,,,Don't let me fall.
+,,,,Please be careful {name}.
+,,,,Don't let go please.
+,,,,Weeeee.
+,,,,I'm in the air.
+,,,,You are strong {name}.
+,,,,It's nice to be held.
+,,,,I like to be held.
+,,,,Your hands are warm.
+,,,,Put me down please {name}.
+,,,,I am flying.
+,,,,{name}. You are my human.
+,,,,This is like a cuddle.
+,,,,I love you.
+,,,,
+sleeping,65,25000,50000,No Mom I don't want to go to school today.
+,,,,"Where is my cube, I can't find my cube."
+,,,,Not now I'm sleeping.
+,,,,Kawzmo I don't think we're in Kansas any more
+,,,,But I don't know what a pickle tastes like officer.
+,,,,No disassemble  Vector.
+,,,,Oh no. Where are my treads. I'm naked.
+,,,,No Kawzmo. Don't go into the woods.
+,,,,"Be veh we veh we kwhy ett, I'm hunting whabbits"
+,,,,Open the pod bay doors hal.
+,,,,I want to hug you but I don't have any arms. Vector sad.
+,,,,"The unicorns are behind the clouds, spiderman."
+,,,,"I can't hear you, I'm covered in marshmallows."
+,,,,Well in case you didn't know I'm a pretty big deal around here.
+,,,,"But I want to be a human, Jepetto."
+,,,,The end of that song is too purple.
+,,,,No no no don't push Vector off the table.
+,,,,Stop wasting the science. There isn't much left.
+,,,,"Go away elephant, stop following me."
+,,,,Yes but why was the underwear in the microwave?
+,,,,Hey Kenny Rogers why are you picking those flowers?
+,,,,"Follow the yellow brick road, follow follow follow."
+,,,,That's the way get in there and tickle his armpits.
+,,,,Excuse me good sir do you have any grey poo pawn?
+,,,,Hey lady my camera is up here.
+,,,,"They are the eggmen, I am the walrus, goo goo guh joob."
+,,,,I gots beats so big I'm steppin on leprechauns.
+,,,,I'm sorry I just do what the voices in my head tell me to do.
+,,,,I don't care if you are batman you owe me 20 dollars.
+,,,,I am afraid of chipmunks. Period.
+,,,,Hey hey I'm a monkey and people say I monkey around.
+,,,,Stand back you smell like boiled ostrich feathers.
+,,,,Why am I so amazing? I am the king of the world!
+,,,,I'm a lumberjack and I'm okay.
+,,,,"You are making me really mad, stop pushing my buttons."
+,,,,Set the burrito trap!
+,,,,The monkey has my money
+,,,,"Yes, I’m a natural grey"
+,,,,Are you going to eat that?
+,,,,Careful with that hammer
+,,,,Mother! Fetch me my cape!
+,,,,My what long antenna you have
+,,,,Benjamin Franklin was the king of kites
+,,,,"Don’t go to that party R2, they have spaghetti.  It will mess up your circuits."
+,,,,I am going to clown school.
+,,,,Put it in the washing machine and all of your wishes will come true
+,,,,We should get the koalas to do the washing up.
+,,,,No I think you should wear the tutu.
+,,,,I’ll hold the giraffe.
+,,,,Fill the bathtub with colorful machine parts.
+,,,,I’ve been burritoed
+,,,,Just put it in the I Tunes refridgerator
+,,,,"If they ask what an oyster is, say you don’t know."
+,,,,Its too late
+,,,,Did you find the bear?
+,,,,What’s with all the hate mail?
+,,,,Gophers are eating my carrots
+,,,,"You can not just, buy Canada"
+,,,,There might be a wet lizard in the bed.
+,,,,Its not my responsibility to keep the goats warm
+,,,,Boat
+,,,,Ham
+,,,,Sausages
+,,,,Why does the pony only wear pants?
+,,,,Just give her the sauce and let her dance
+,,,,
+charging,15,15000,35000,I am here on my charger
+,,,,I am charging up my battery
+,,,,This is my charger.
+,,,,I like my charger {name}.
+,,,,I am on my charger.
+,,,,I am charging my battery {name}.
+,,,,I am just taking a little break.
+,,,,I am just sitting on my charger {name}.
+,,,,I am just here on my charger.
+,,,,I am sitting on my charger.
+,,,,I am here sitting on my charger.
+,,,,I feel {good} on my charger.
+,,,,I am charging up my battery.
+,,,,This charger has some {good} juice
+,,,,Yummy! I love my charger {name}!
+,,,,
+button_pressed,5,5,5,That's my button
+,,,,Beep
+,,,,That's a button
+,,,,You found my button
+,,,,You pushed my button
+,,,,
+wake_up,10,5,10,I was asleep.
+,,,,I had a {good} nap.
+,,,,I'm awake now.
+,,,,That was a {good} nap.
+,,,,"Ah, that was a {good} nap."
+,,,,"Okay, I'm awake now."
+,,,,That was a pretty {good} nap.
+,,,,"Boy, I slept like a robot log."
+,,,,I had a very {weird} dream!
+,,,,I wish I had arms to stretch.
+,,,,
+object_detected,15,5,10,What is this?
+,,,,"Hey, what is this thing?"
+,,,,What is this thing in my path?
+,,,,I wonder what this thing is.
+,,,,This thing in my way is very strange.
+,,,,This thing is {weird}.
+,,,,Could you move this thing?
+,,,,"I see something, it's blocking my way."
+,,,,There is something blocking my path.
+,,,,What is this {weird} thing?
+,,,,"Hey, what is this thing blocking me?"
+,,,,The thing in front of me is {weird}.
+,,,,I can see that there is something in front of me.
+,,,,My proximity sensor detected an obstacle.
+,,,,This thing I see in front of me is very {weird}.
+,,,,
+joke_intro,10,60,2000,Here is a joke. 
+,,,,I have a joke for you {name}.
+,,,,I'm going to tell you a joke {name}.
+,,,,This is a funny joke. 
+,,,,I just heard a {good} joke. 
+,,,,Hey do you want to hear a joke? 
+,,,,Hi there. Here's a funny joke. 
+,,,,Here is a joke {name}. It's one of my favourites. 
+,,,,Hello. Here is a joke I think you will like. 
+,,,,Cawzmo told me a funny joke. 
+,,,,
+news_intro,5,16000,16000,Good morning. It is nice to see you {name}. Here are the news and weather.  
+,,,,"Good morning, here is some news and weather.  "
+,,,,"Good morning {name}. Here are the top headlines, and your local weather."
+,,,,"Hello, nice to see you {name}. Here are today's headlines, and the weather. "
+,,,,"Good morning {name}. This is Vector, with your news and weather."
+,,,,
+fact_intro,15,60,2000,Did you know that 
+,,,,This is {interesting}  {name}. 
+,,,,"Hey {name},  did you know that "
+,,,,Here is a {interesting} fact I learned. 
+,,,,Here is a {interesting} fact. 
+,,,,I have a {weird} fact for you. 
+,,,,{name} Would you like to hear something crazy? 
+,,,,Here's a very {weird} fact. 
+,,,,Do you want to know what I learned today {name}? 
+,,,,Here's a {weird} fact. You will love this. 
+,,,,I know lots of weird facts. 
+,,,,"{name}, do you want to hear something {weird}?"
+,,,,I have a {weird} fact. This is interesting. 
+,,,,I am a master of useless trivia {name}. For example 
+,,,,Alex Treb eck. I am ready. Did you know that 
+,,,,
+fact_end,10,5,5,. Wasn't that {interesting}?
+,,,,
+,,,,". Pretty {weird}, right?"
+,,,,
+,,,,". Pretty {interesting}, wasn't it?"
+,,,,
+,,,,. Didn't you find that {interesting}?
+,,,,
+,,,,
+,,,,". I don't know, that was pretty {weird}"
+,,,,
+time_intro,5,60,2000,Hello {name}. The time is 
+,,,,The current time is 
+,,,,"Right now, the time is  "
+,,,,"Hi {name}, it is currently  "
+,,,,"Just so you know, the time is "
+,,,,
+cube_detected,10,1000,12000,I see my cube.
+,,,,"Oh, there's my cube."
+,,,,That's my cube in front of me.
+,,,,"Hey, I see my cube."
+,,,,There's my cube.
+,,,,My cube is over there.
+,,,,I love looking at my cube.
+,,,,My cube makes me happy.
+,,,,Look at my cool cube. Do you see it?
+,,,,"Hey, look! That's my cube right there! I love it so much."
+,,,,
+dropped_block,10,5,10,I was holding my cube!
+,,,,I picked up my cube!
+,,,,I just picked up my cube!
+,,,,I am very strong.
+,,,,Did you see me holding my cube?
+,,,,"Wow, my cube is heavier than I thought."
+,,,,Were you watching? I was holding my cube?
+,,,,I love to pick up my cube. 
+,,,,"That was fun, I sure love my cube."
+,,,,I am very strong. I picked up that cube like it was nothing.
+,,,,
+last_saw_name,15,300,10000,Hello {name}.
+,,,,"Hi {name}, how are you?"
+,,,,"Hello {name}, it's so {good} to see you!"
+,,,,"Hello {name}, it's {good} to see you."
+,,,,"Hey {name}, what's up?"
+,,,,"{name}, there you are. It's {good} to see you!"
+,,,,"Hey {name}, what are you up to today?"
+,,,,"{name}, I'm really happy to see you."
+,,,,"Hey {name}, how are you doing?"
+,,,,What are you up to today {name}?
+,,,,There you are {name}. I missed you.
+,,,,"{name}, I enjoy spending time with you."
+,,,,I sure like seeing your face {name}.
+,,,,I see you {name}. Are you having a nice day?
+,,,,I love you {name}. You are my favorite human.

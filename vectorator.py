@@ -12,6 +12,7 @@ from anki_vector.faces import Face
 from anki_vector.util import degrees, distance_mm, speed_mmps
 from anki_vector import audio
 from anki_vector.connection import ControlPriorityLevel
+from anki_vector.user_intent import UserIntent, UserIntentEvent
 import apis
 import config
 
@@ -168,6 +169,8 @@ def randomizer(say):
 def vector_react(arg):
     global ts
     if arg != "news_intro": print("Vector is trying to react to: ", arg)
+
+
     if (datetime.now() - ts["wake_word"]).total_seconds() < 15: # If Vector was listening, don't react for a little while
         print("Wake word timeout")
         return
@@ -210,7 +213,8 @@ def say(arg_name):
     if arg_name == "fact_intro": to_say = to_say + get_fact() # if fact then add to end of intro
     if arg_name == "time_intro": to_say = to_say + get_time() # Randomly announce the time
     if arg_name == "random_weather": to_say = get_weather("random_weather") # Randomly announce a weather fact
-    
+    if arg_name == "stranger": to_say = to_say + get_pickupline()
+
     to_say = randomizer(to_say) # This replaces certain words with synonyms
     max_attempts = 15 # Had to add this after the last update. I'm having trouble getting control of Vector to speak
     current_attempts = 0
@@ -228,6 +232,8 @@ def say(arg_name):
             return
         except:
             print("Couldn't get control of robot. Trying again to say: ", to_say)
+            batt = robot.get_battery_state()
+            print("Battery Level ", batt.battery_level, batt.battery_volts)
             time.sleep(1)
 
     if current_attempts == 15:
@@ -267,8 +273,15 @@ def say_sleep(arg_name):
 
 # An API call that allows Vector to deliver a weather forecast (it's not always accurate, in my experience)
 def get_weather(var):
-    url = f"http://api.apixu.com/v1/forecast.json?key={apis.api_weather}&q={config.loc_city}.{config.loc_region}"
-    data = urllib.request.urlopen(url).read()
+    url = f"https://api.apixu.com/v1/forecast.json?key={apis.api_weather}&q={config.loc_city}.{config.loc_region}"
+    req = urllib.request.Request(
+        url,
+        data=None,
+        headers={
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+        }
+        )
+    data = urllib.request.urlopen(req).read()
     output = json.loads(data)
     forecast_condition = output["forecast"]["forecastday"][0]["day"]["condition"]["text"]
     current_condition = output["current"]["condition"]["text"]
@@ -355,8 +368,52 @@ def get_joke():
 def get_time():
     return time.strftime("%I:%M %p")
 
+def get_pickupline():
+    lines = {"How you doin?",
+             "I don't know you.",
+             "Have we met before?",
+             "Hey you!",
+             "Wilson!",
+             "May I introduce myself, I am Vector",
+             "Say Vector, I am, then your name so I can recognize you in the future",
+             "Are you my mother?",
+             "What are you doing in my house?"
+             }
+    my_rand = random.randint(0, lines.__len__() - 1)
+    return lines[my_rand]
+
+
 def on_wake_word(robot, event_type, event):
     vector_react("wake_word")
+    user_intent = event.wake_word_end.intent_json
+    if len(user_intent) > 0:
+        j = json.loads(user_intent)
+        print(j['type'])
+        #print(UserIntentEvent.greeting_goodmorning)
+
+        valid_response = ["greeting_goodmorning", "greeting_hello",
+                          "imperative_come", "imperative_lookatme",
+                          "weather_response"]
+        if j['type'] == "weather_response":
+            #allow vector to do his built in weather
+            time.sleep(10)
+            say("random_weather")
+        else:
+            if j['type'] in valid_response :
+                print("valid response")
+                reaction = random.choices(["joke_intro", "fact_intro", "time_intro", "random_weather", "last_saw_name"])
+                print(reaction)
+                say(reaction[0])
+
+
+
+def on_user_intent(robot, event_type, event, done):
+    user_intent = UserIntent(event)
+
+    valid_response = [UserIntentEvent.greeting_goodmorning, UserIntentEvent.greeting_hello, UserIntentEvent.imperative_come, UserIntentEvent.imperative_lookatme, UserIntentEvent.weather_response]
+    if user_intent.intent_event == any(valid_response):
+        vector_react("user")
+
 
 # Event handler code for Vector detecting his cube -- if he heard his wake_word he won't try to talk right away as he will forget what he was doing
 def on_cube_detected(robot, event_type, event):
@@ -365,7 +422,9 @@ def on_cube_detected(robot, event_type, event):
             vector_react("cube_detected")
 
 # MAIN ******************************************************************************************************************************
-with anki_vector.Robot(enable_face_detection=True) as robot:
+with anki_vector.Robot(enable_face_detection=True
+
+                       ) as robot:
     robot.conn.release_control() # I release control so Vector will do his normal behaviors
     robot.audio.set_master_volume(VOL[config.sound_volume])
 
@@ -375,9 +434,10 @@ with anki_vector.Robot(enable_face_detection=True) as robot:
     ctime = time.time() + random.randint(200,400)
     carry_flag = False
 
-    robot.events.subscribe(on_wake_word, Events.wake_word) 
+    robot.events.subscribe(on_wake_word, Events.wake_word)
     robot.events.subscribe(on_cube_detected, Events.robot_observed_object)
-
+    robot.camera.init_camera_feed()
+    #robot.events.subscribe(on_user_intent, Events.user_intent)
     while True:
     
         if robot.status.is_being_held:
@@ -404,7 +464,8 @@ with anki_vector.Robot(enable_face_detection=True) as robot:
         if robot.status.is_button_pressed:
             vector_react("button_pressed")
 
-        if datetime.now().hour < 12 and (datetime.now() - ts["last_saw_face"]).total_seconds() < 5: # It's morning and Vector recently saw a face
+        #any time  datetime.now().hour < 12 and
+        if (datetime.now() - ts["last_saw_face"]).total_seconds() < 5: # It's morning and Vector recently saw a face
             vector_react("news_intro")
 
         distance_mm = robot.proximity.last_sensor_reading.distance.distance_mm
@@ -418,6 +479,10 @@ with anki_vector.Robot(enable_face_detection=True) as robot:
             if robot.status.is_docking_to_marker == False and robot.status.is_being_held == False:
                 if (datetime.now() - ts["cube_detected"]).total_seconds() > 10: # I don't want Vector to stop in front of his cube and say "What is this?" (need to work on this)
                     vector_react("object_detected")
+                    robot.vision.enable_display_camera_feed_on_face(True)
+                    time.sleep(5.0)
+                    robot.vision.enable_display_camera_feed_on_face(False)
+
                 else:
                     print("Vector saw his cube recently, skipping object announcement")
 
@@ -429,15 +494,31 @@ with anki_vector.Robot(enable_face_detection=True) as robot:
 
         if time.time() > ftime: # Is timer up?
             my_var = robot.world.visible_faces
+            anyrecognized = False
             for face in my_var:
                 ts["last_saw_face"] = datetime.now() # Update timestamp - Vector saw a face
                 if len(face.name) > 0: # Did Vector recognize the face?
                     ts["last_saw_name"] = datetime.now() # Update timestamp - Vector recognized a face
                     LAST_NAME = face.name # Save name of person Vector recognized
+                    anyrecognized = True
                 if time.time() > ltime: # Vector saw a face, and the timer for random comments is up (they are weighted, with "pass" for 'do nothing')
                     reaction = random.choices(["pass", "joke_intro", "fact_intro", "time_intro", "random_weather", "last_saw_name"], [50, 10, 10, 20, 5, 10], k = 1)
                     vector_react(reaction[0])
                     ltime = time.time() + 3
             ftime = time.time() + 1 # Reset timer
+
+            if not robot.status.is_on_charger:
+                battery_state = robot.get_battery_state()
+                if battery_state.battery_volts < 3.6:
+                    robot.behavior.say_text("I need to find my charger soon.")
+                    time.sleep(30)
+
+                #if battery_state.battery_level < 2:
+                    #robot.behavior.say_text("My battery level is low.")
+
+            #if not anyrecognized and my_var.__sizeof__() > 0:
+             #   if ts["last_saw_stranger"] + datetime.timedelta(0, 600) < datetime.now():
+              #      ts["last_saw_stranger"] = datetime.now()
+               #     vector_react("stranger")
 
         time.sleep(0.1) # Sleep then loop back (Do I need this? Should it be longer?)
