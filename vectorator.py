@@ -274,62 +274,76 @@ def say_sleep(arg_name):
 
 # An API call that allows Vector to deliver a weather forecast (it's not always accurate, in my experience)
 def get_weather(var):
-    url = f"https://api.apixu.com/v1/forecast.json?key={apis.api_weather}&q={config.loc_city}.{config.loc_region}"
-    req = urllib.request.Request(
-        url,
-        data=None,
-        headers={
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
-        }
-        )
-    data = urllib.request.urlopen(req).read()
-    output = json.loads(data)
-    forecast_condition = output["forecast"]["forecastday"][0]["day"]["condition"]["text"]
-    current_condition = output["current"]["condition"]["text"]
-    forecast_avghumidity = output["forecast"]["forecastday"][0]["day"]["avghumidity"]
-    current_humidity = output["current"]["humidity"]
+    #10/23/2019 JDR new API endpoint (and terms)
+    try:
+        #location can be city, state; city, country; zip code.
+        url = f"http://api.weatherstack.com/current?access_key={apis.api_weather}&query={config.weather_location}&units={config.temperature[0]}"
+        print(url)
+        req = urllib.request.Request(
+            url,
+            data=None,
+            headers={}
+            )
+        data = urllib.request.urlopen(req).read()
+        output = json.loads(data)
+        #10/23/2019 JDR free api, no forecast (weather.gov for US?)
+        #forecast_condition = output["forecast"]["forecastday"][0]["day"]["condition"]["text"]
+        #10/23/2019 JDR new API object
+        current_condition = output["current"]["weather_descriptions"]
+        #forecast_avghumidity = output["forecast"]["forecastday"][0]["day"]["avghumidity"]
+        current_humidity = output["current"]["humidity"]
 
-    if config.temperature == "farenheit":
-        forecast_temp_avg = output["forecast"]["forecastday"][0]["day"]["avgtemp_f"]
-        forecast_temp_high = output["forecast"]["forecastday"][0]["day"]["maxtemp_f"]
-        forecast_temp_low = output["forecast"]["forecastday"][0]["day"]["mintemp_f"]
-        forecast_wind = output["forecast"]["forecastday"][0]["day"]["maxwind_mph"]
-        current_temp_feelslike = output["current"]["feelslike_f"]
-        current_temp = output["current"]["temp_f"]
-        current_wind = output["current"]["wind_mph"]
-        wind_speed = " miles per hour"
-    else:
-        forecast_temp_avg = output["forecast"]["forecastday"][0]["day"]["avgtemp_c"]
-        forecast_temp_high = output["forecast"]["forecastday"][0]["day"]["maxtemp_c"]
-        forecast_temp_low = output["forecast"]["forecastday"][0]["day"]["mintemp_c"]
-        forecast_wind = output["forecast"]["forecastday"][0]["day"]["maxwind_kph"]
-        current_temp_feelslike = output["current"]["feelslike_c"]
-        current_temp = output["current"]["temp_c"]
-        current_wind = output["current"]["wind_kph"]
-        wind_speed = " kilometers per hour"
+        weather_name = output["location"]["name"]
+        weather_region = output["location"]["region"]
 
-    # In the morning, Vector tells the news and weather when he sees a face
-    if var == "forecast":
-        weather = []
-        weather.append(f". And now for some weather. Today in {config.loc_city} {config.loc_region}, it will be {forecast_condition}, with a temperature of {forecast_temp_high} degrees, and wind speeds around {forecast_wind}{wind_speed}. Right now, it is {current_temp} degrees.")
-        weather.append(f". Right now in {config.loc_city} {config.loc_region}, it is {current_temp} degrees and {current_condition}. Later today, it will be {forecast_condition}, with a high of {forecast_temp_high} degrees and a low of {forecast_temp_low} degrees.")
-        weather.append(f". Here's your local weather. The temperature in {config.loc_city} {config.loc_region} right now, is {current_temp} degrees. The high today will be {forecast_temp_high} degrees, and look for a low of around {forecast_temp_low}. Winds will be {forecast_wind}{wind_speed}.")
-        weather.append(f". Moving to the weather. It is currently {current_condition} in {config.loc_city} {config.loc_region}. Later today it will be {forecast_condition}, with an average temperature of {forecast_temp_avg} degrees, and wind speeds around {forecast_wind}{wind_speed}.") 
-        return(random.choice(weather))
+        #New API, specify the units in the request
+        current_temp_feelslike = output["current"]["feelslike"]
+        current_temp = output["current"]["temperature"]
+        current_wind = output["current"]["wind_speed"]
 
-    # At random times, Vector will see a face and announce something about the weather
-    if var == "random_weather":
+        if config.temperature == "farenheit":
+            #forecast_temp_avg = output["forecast"]["forecastday"][0]["day"]["avgtemp_f"]
+            #forecast_temp_high = output["forecast"]["forecastday"][0]["day"]["maxtemp_f"]
+            #forecast_temp_low = output["forecast"]["forecastday"][0]["day"]["mintemp_f"]
+            #forecast_wind = output["forecast"]["forecastday"][0]["day"]["maxwind_mph"]
+            wind_speed = " miles per hour"
+        else:
+            #forecast_temp_avg = output["forecast"]["forecastday"][0]["day"]["avgtemp_c"]
+            #forecast_temp_high = output["forecast"]["forecastday"][0]["day"]["maxtemp_c"]
+            #forecast_temp_low = output["forecast"]["forecastday"][0]["day"]["mintemp_c"]
+            #forecast_wind = output["forecast"]["forecastday"][0]["day"]["maxwind_kph"]
+            wind_speed = " kilometers per hour"
+
+        # In the morning, Vector tells the news and weather when he sees a face
+    #    if var == "forecast":
+    #        weather = []
+    #        weather.append(f". And now for some weather. Today in {config.loc_city} {config.loc_region}, it will be {forecast_condition}, with a temperature of {forecast_temp_high} degrees, and wind speeds around {forecast_wind}{wind_speed}. Right now, it is {current_temp} degrees.")
+    #        weather.append(f". Right now in {config.loc_city} {config.loc_region}, it is {current_temp} degrees and {current_condition}. Later today, it will be {forecast_condition}, with a high of {forecast_temp_high} degrees and a low of {forecast_temp_low} degrees.")
+    #        weather.append(f". Here's your local weather. The temperature in {config.loc_city} {config.loc_region} right now, is {current_temp} degrees. The high today will be {forecast_temp_high} degrees, and look for a low of around {forecast_temp_low}. Winds will be {forecast_wind}{wind_speed}.")
+    #        weather.append(f". Moving to the weather. It is currently {current_condition} in {config.loc_city} {config.loc_region}. Later today it will be {forecast_condition}, with an average temperature of {forecast_temp_avg} degrees, and wind speeds around {forecast_wind}{wind_speed}.")
+    #        return(random.choice(weather))
+
+        # At random times, Vector will see a face and announce something about the weather
+     #   if var == "random_weather":
         rnd_weather = []
         if {current_temp} != {current_temp_feelslike}:
             rnd_weather.append(f"The current temperature is {current_temp} degrees, but it feels like {current_temp_feelslike} degrees.")
-        rnd_weather.append(f"In {config.loc_city} right now, the temperature is {current_temp} degrees.")
+        rnd_weather.append(f"Right now, the temperature is {current_temp} degrees.")
         if current_wind < 15:
-            rnd_weather.append(f"Right now in {config.loc_city} it is a relatively calm {current_temp} degrees, with winds at {current_wind}{wind_speed}.")
+            rnd_weather.append(f"Right now, it is a relatively calm {current_temp} degrees, with winds at {current_wind}{wind_speed}.")
         else:
-            rnd_weather.append(f"In {config.loc_city} right now, it is a blustery {current_temp} degrees, with winds at {current_wind}{wind_speed}.")
-        rnd_weather.append(f"In {config.loc_city}, at this moment, the weather is {current_condition}.")
-        rnd_weather.append(f"Hello. It is currently {current_temp} degrees in {config.loc_city}. The humidity is {current_humidity} percent.")
-        return(random.choice(rnd_weather))
+            rnd_weather.append(f"Right now, it is a blustery {current_temp} degrees, with winds at {current_wind}{wind_speed}.")
+            rnd_weather.append(f"At this moment, the weather is {current_condition}.")
+            rnd_weather.append(f"Hello. It is currently {current_temp} degrees. The humidity is {current_humidity} percent.")
+
+    except:
+        print("Unexpected weather error:", sys.exc_info()[0])
+        rnd_weather.append("I'm more of an indoor robot.")
+        rnd_weather.append("I have no idea what it is like out there.")
+        rnd_weather.append("I'm a robot, not a weather forecaster.")
+        rnd_weather.append("I had trouble getting the weather for you.")
+
+    return(random.choice(rnd_weather))
 
 # I was using an API, but the free account only gave me a few hundred accesses per week. Then I found an RSS feed that works great!
 # Users can specify how many news stories to hear. If more than one I randomly choose a bridge to say between them (like "In other news...")
@@ -391,7 +405,7 @@ def on_wake_word(robot, event_type, event):
         j = json.loads(user_intent)
         print(j['type'])
         #print(UserIntentEvent.greeting_goodmorning)
-
+        print(j)
         valid_response = ["greeting_goodmorning", "greeting_hello",
                           "imperative_come", "imperative_lookatme",
                           "weather_response"]
@@ -400,9 +414,9 @@ def on_wake_word(robot, event_type, event):
             time.sleep(10)
             say("random_weather")
         else:
-            if j['type'] in valid_response :
+            if j['type'] in valid_response:
                 print("valid response")
-                reaction = random.choices(["joke_intro", "fact_intro", "time_intro", "random_weather", "last_saw_name"])
+                reaction78u = random.choices(["joke_intro", "fact_intro", "time_intro", "random_weather", "last_saw_name"])
                 print(reaction)
                 say(reaction[0])
 
@@ -410,7 +424,7 @@ def on_wake_word(robot, event_type, event):
 
 def on_user_intent(robot, event_type, event, done):
     user_intent = UserIntent(event)
-
+    print(user_intent.intent_data)
     valid_response = [UserIntentEvent.greeting_goodmorning, UserIntentEvent.greeting_hello, UserIntentEvent.imperative_come, UserIntentEvent.imperative_lookatme, UserIntentEvent.weather_response]
     if user_intent.intent_event == any(valid_response):
         vector_react("user")
