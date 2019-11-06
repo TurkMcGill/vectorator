@@ -15,6 +15,7 @@ from anki_vector.connection import ControlPriorityLevel
 from anki_vector.user_intent import UserIntent, UserIntentEvent
 import apis
 import config
+import sys, traceback
 
 # (I think these are called enums in Python... They relate to my dialogue.csv file)
 NAME = 0
@@ -204,10 +205,15 @@ def vector_react(arg):
 
 # This makes Vector talk by looking up dialogue in the dlg file 
 def say(arg_name):
-    row_start = dic[arg_name]
-    row_end = row_start + int(dlg[row_start][LINES]) # Use row_start and LINES (from dialogue file) to figure out where the dialogue starts/stops
-    num_row = get_low(row_start,row_end-1)
-    to_say = dlg[num_row][MOOD] # Vector's default mood is "normal", eventually he will say different dialogue based on his mood
+    if arg_name in dic:
+        row_start = dic[arg_name]
+        print(row_start)
+        row_end = row_start + int(dlg[row_start][LINES]) # Use row_start and LINES (from dialogue file) to figure out where the dialogue starts/stops
+        num_row = get_low(row_start,row_end-1)
+        to_say = dlg[num_row][MOOD] # Vector's default mood is "normal", eventually he will say different dialogue based on his mood
+    else:
+        to_say = ""
+
     if arg_name == "wake_word" : return # If wake_word then skip talking for a bit
     if arg_name == "news_intro": to_say = to_say + get_news() + get_weather("forecast") # if news then add to end of intro
     if arg_name == "joke_intro": to_say = to_say + get_joke() # if joke then add to end of intro
@@ -215,6 +221,7 @@ def say(arg_name):
     if arg_name == "time_intro": to_say = to_say + get_time() # Randomly announce the time
     if arg_name == "random_weather": to_say = get_weather("random_weather") # Randomly announce a weather fact
     if arg_name == "stranger": to_say = to_say + get_pickupline()
+    if arg_name == "weather_forecast": to_say = get_weather("forecast")
 
     to_say = randomizer(to_say) # This replaces certain words with synonyms
     max_attempts = 15 # Had to add this after the last update. I'm having trouble getting control of Vector to speak
@@ -272,12 +279,20 @@ def say_sleep(arg_name):
     robot.audio.set_master_volume(VOL[config.sound_volume])
     robot.conn.release_control()
 
+
+def average(number1, number2):
+    return (number1 + number2) / 2
+
 # An API call that allows Vector to deliver a weather forecast (it's not always accurate, in my experience)
 def get_weather(var):
     #10/23/2019 JDR new API endpoint (and terms)
     try:
         #location can be city, state; city, country; zip code.
-        url = f"http://api.weatherstack.com/current?access_key={apis.api_weather}&query={config.weather_location}&units={config.temperature[0]}"
+
+        if var == "forecast":
+            url = f"http://api.openweathermap.org/data/2.5/forecast?APPID={apis.api_weather}&q={config.weather_location}&units={config.temperature}"
+        else:
+            url = f"http://api.openweathermap.org/data/2.5/weather?APPID={apis.api_weather}&q={config.weather_location}&units={config.temperature}"
         print(url)
         req = urllib.request.Request(
             url,
@@ -286,25 +301,36 @@ def get_weather(var):
             )
         data = urllib.request.urlopen(req).read()
         output = json.loads(data)
-        #10/23/2019 JDR free api, no forecast (weather.gov for US?)
-        #forecast_condition = output["forecast"]["forecastday"][0]["day"]["condition"]["text"]
-        #10/23/2019 JDR new API object
-        current_condition = output["current"]["weather_descriptions"]
-        #forecast_avghumidity = output["forecast"]["forecastday"][0]["day"]["avghumidity"]
-        current_humidity = output["current"]["humidity"]
 
-        weather_name = output["location"]["name"]
-        weather_region = output["location"]["region"]
+        print(data)
 
-        #New API, specify the units in the request
-        current_temp_feelslike = output["current"]["feelslike"]
-        current_temp = output["current"]["temperature"]
-        current_wind = output["current"]["wind_speed"]
+        if var == "forecast":
+            #section =
+            forecast_condition = output["list"]["weather"]["description"]
+            forecast_humidity = output["list"]["main"]["humidity"]
+            forecast_temp = output["list"]["main"]["temp"]
+            forecast_temp_high = output["list"]["main"]["temp_min"]
+            forecast_temp_low = output["list"]["main"]["temp_max"]
+
+            forecast_wind = output["list"]["wind"]["speed"]
+        else:
+            #10/23/2019 JDR free api, no forecast (weather.gov for US?)
+            #forecast_condition = output["forecast"]["forecastday"][0]["day"]["condition"]["text"]
+            #10/23/2019 JDR new API object
+            current_condition = output["weather"]["description"]
+            #forecast_avghumidity = output["forecast"]["forecastday"][0]["day"]["avghumidity"]
+            current_humidity = output["main"]["humidity"]
+
+            #weather_name = output["location"]["name"]
+            #weather_region = output["location"]["region"]
+
+            #New API, specify the units in the request
+            #current_temp_feelslike = output["current"]["feelslike"]
+            current_temp = average(output["main"]["temp_min"], output["main"]["temp_max"])
+            current_wind = output["wind"]["speed"]
 
         if config.temperature == "farenheit":
             #forecast_temp_avg = output["forecast"]["forecastday"][0]["day"]["avgtemp_f"]
-            #forecast_temp_high = output["forecast"]["forecastday"][0]["day"]["maxtemp_f"]
-            #forecast_temp_low = output["forecast"]["forecastday"][0]["day"]["mintemp_f"]
             #forecast_wind = output["forecast"]["forecastday"][0]["day"]["maxwind_mph"]
             wind_speed = " miles per hour"
         else:
@@ -315,29 +341,31 @@ def get_weather(var):
             wind_speed = " kilometers per hour"
 
         # In the morning, Vector tells the news and weather when he sees a face
-    #    if var == "forecast":
-    #        weather = []
-    #        weather.append(f". And now for some weather. Today in {config.loc_city} {config.loc_region}, it will be {forecast_condition}, with a temperature of {forecast_temp_high} degrees, and wind speeds around {forecast_wind}{wind_speed}. Right now, it is {current_temp} degrees.")
-    #        weather.append(f". Right now in {config.loc_city} {config.loc_region}, it is {current_temp} degrees and {current_condition}. Later today, it will be {forecast_condition}, with a high of {forecast_temp_high} degrees and a low of {forecast_temp_low} degrees.")
-    #        weather.append(f". Here's your local weather. The temperature in {config.loc_city} {config.loc_region} right now, is {current_temp} degrees. The high today will be {forecast_temp_high} degrees, and look for a low of around {forecast_temp_low}. Winds will be {forecast_wind}{wind_speed}.")
-    #        weather.append(f". Moving to the weather. It is currently {current_condition} in {config.loc_city} {config.loc_region}. Later today it will be {forecast_condition}, with an average temperature of {forecast_temp_avg} degrees, and wind speeds around {forecast_wind}{wind_speed}.")
-    #        return(random.choice(weather))
+        if var == "forecast":
+            weather = []
+            weather.append(f". And now for some weather. Today, it will be {forecast_condition}, with a temperature of {forecast_temp_high} degrees, and wind speeds around {forecast_wind}{wind_speed}. Right now, it is {current_temp} degrees.")
+            weather.append(f". Right now in {config.loc_city} {config.loc_region}, it is {current_temp} degrees and {current_condition}. Later today, it will be {forecast_condition}, with a high of {forecast_temp_high} degrees and a low of {forecast_temp_low} degrees.")
+            weather.append(f". Here's your local weather. The temperature in {config.loc_city} {config.loc_region} right now, is {current_temp} degrees. The high today will be {forecast_temp_high} degrees, and look for a low of around {forecast_temp_low}. Winds will be {forecast_wind}{wind_speed}.")
+            weather.append(f". Moving to the weather. It is currently {current_condition} in {config.loc_city} {config.loc_region}. Later today it will be {forecast_condition}, with an average temperature of {forecast_temp_avg} degrees, and wind speeds around {forecast_wind}{wind_speed}.")
+            return(random.choice(weather))
 
         # At random times, Vector will see a face and announce something about the weather
-     #   if var == "random_weather":
-        rnd_weather = []
-        if {current_temp} != {current_temp_feelslike}:
-            rnd_weather.append(f"The current temperature is {current_temp} degrees, but it feels like {current_temp_feelslike} degrees.")
-        rnd_weather.append(f"Right now, the temperature is {current_temp} degrees.")
-        if current_wind < 15:
-            rnd_weather.append(f"Right now, it is a relatively calm {current_temp} degrees, with winds at {current_wind}{wind_speed}.")
-        else:
-            rnd_weather.append(f"Right now, it is a blustery {current_temp} degrees, with winds at {current_wind}{wind_speed}.")
-            rnd_weather.append(f"At this moment, the weather is {current_condition}.")
-            rnd_weather.append(f"Hello. It is currently {current_temp} degrees. The humidity is {current_humidity} percent.")
+        if var == "random_weather":
+            rnd_weather = []
+            #if {current_temp} != {current_temp_feelslike}:
+            #   rnd_weather.append(f"The current temperature is {current_temp} degrees, but it feels like {current_temp_feelslike} degrees.")
+            rnd_weather.append(f"Right now, the temperature is {current_temp} degrees.")
 
-    except:
-        print("Unexpected weather error:", sys.exc_info()[0])
+            if current_wind < 15:
+                rnd_weather.append(f"Right now, it is a relatively calm {current_temp} degrees, with winds at {current_wind}{wind_speed}.")
+            else:
+                rnd_weather.append(f"Right now, it is a blustery {current_temp} degrees, with winds at {current_wind}{wind_speed}.")
+                rnd_weather.append(f"At this moment, the weather is {current_condition}.")
+                rnd_weather.append(f"Hello. It is currently {current_temp} degrees. The humidity is {current_humidity} percent.")
+
+    except Exception as inst:
+        print(traceback.format_exc())
+
         rnd_weather.append("I'm more of an indoor robot.")
         rnd_weather.append("I have no idea what it is like out there.")
         rnd_weather.append("I'm a robot, not a weather forecaster.")
@@ -410,13 +438,17 @@ def on_wake_word(robot, event_type, event):
                           "imperative_come", "imperative_lookatme",
                           "weather_response"]
         if j['type'] == "weather_response":
-            #allow vector to do his built in weather
-            time.sleep(10)
-            say("random_weather")
+            if j["isForecast"] == "true":
+                print("weather_forecast")
+                say("weather_forecast")
+            else:
+                # allow vector to do his built in weather
+                time.sleep(10)
+                say("random_weather")
         else:
             if j['type'] in valid_response:
                 print("valid response")
-                reaction78u = random.choices(["joke_intro", "fact_intro", "time_intro", "random_weather", "last_saw_name"])
+                reaction = random.choices(["joke_intro", "fact_intro", "time_intro", "random_weather", "last_saw_name"])
                 print(reaction)
                 say(reaction[0])
 
@@ -524,9 +556,10 @@ with anki_vector.Robot(enable_face_detection=True
 
             if not robot.status.is_on_charger:
                 battery_state = robot.get_battery_state()
-                if battery_state.battery_volts < 3.6:
+                if battery_state.battery_volts <= 3.63:  # <3.61 was too low
+                    print(battery_state.battery_volts)
                     robot.behavior.say_text("I need to find my charger soon.")
-                    time.sleep(30)
+                    time.sleep(90)
 
                 #if battery_state.battery_level < 2:
                     #robot.behavior.say_text("My battery level is low.")
