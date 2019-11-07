@@ -234,7 +234,10 @@ def say(arg_name):
             robot.audio.set_master_volume(VOL[config.voice_volume]) # Change voice volume to config setting
             robot.behavior.say_text(to_say, duration_scalar=1.15) # I slow voice down slightly to make him easier to understand
             if arg_name == "joke_intro":
-                robot.anim.play_animation_trigger(random.choice(JOKE_ANIM)) # If a joke, play a random animation trigger
+                anim_trigger_names = robot.anim.anim_trigger_list
+                #robot.anim.play_animation_trigger(random.choice(JOKE_ANIM)) # If a joke, play a random animation trigger
+                robot.anim.play_animation_trigger(
+                    random.choice(anim_trigger_names))  # If a joke, play a random animation trigger
             robot.conn.release_control()
             robot.audio.set_master_volume(VOL[config.sound_volume]) # Change sound effects volume back to config setting
             return
@@ -305,19 +308,19 @@ def get_weather(var):
         print(data)
 
         if var == "forecast":
-            #section =
-            forecast_condition = output["list"]["weather"]["description"]
-            forecast_humidity = output["list"]["main"]["humidity"]
-            forecast_temp = output["list"]["main"]["temp"]
-            forecast_temp_high = output["list"]["main"]["temp_min"]
-            forecast_temp_low = output["list"]["main"]["temp_max"]
-
-            forecast_wind = output["list"]["wind"]["speed"]
+            section =output["list"][0]
+            forecast_condition = section["weather"][0]["description"]
+            forecast_humidity = section["main"]["humidity"]
+            forecast_temp = output["list"][0]["main"]["temp"]
+            forecast_temp_high = int(round(section["main"]["temp_min"]))
+            forecast_temp_low = int(round(section["main"]["temp_max"]))
+            forecast_temp_avg = int(round(average(forecast_temp_high, forecast_temp_low)))
+            forecast_wind = int(round(section["wind"]["speed"]))
         else:
             #10/23/2019 JDR free api, no forecast (weather.gov for US?)
             #forecast_condition = output["forecast"]["forecastday"][0]["day"]["condition"]["text"]
             #10/23/2019 JDR new API object
-            current_condition = output["weather"]["description"]
+            current_condition = output["weather"][0]["description"]
             #forecast_avghumidity = output["forecast"]["forecastday"][0]["day"]["avghumidity"]
             current_humidity = output["main"]["humidity"]
 
@@ -326,10 +329,10 @@ def get_weather(var):
 
             #New API, specify the units in the request
             #current_temp_feelslike = output["current"]["feelslike"]
-            current_temp = average(output["main"]["temp_min"], output["main"]["temp_max"])
+            current_temp = int(round(average(output["main"]["temp_min"], output["main"]["temp_max"])))
             current_wind = output["wind"]["speed"]
 
-        if config.temperature == "farenheit":
+        if config.temperature == "imperial":
             #forecast_temp_avg = output["forecast"]["forecastday"][0]["day"]["avgtemp_f"]
             #forecast_wind = output["forecast"]["forecastday"][0]["day"]["maxwind_mph"]
             wind_speed = " miles per hour"
@@ -343,10 +346,10 @@ def get_weather(var):
         # In the morning, Vector tells the news and weather when he sees a face
         if var == "forecast":
             weather = []
-            weather.append(f". And now for some weather. Today, it will be {forecast_condition}, with a temperature of {forecast_temp_high} degrees, and wind speeds around {forecast_wind}{wind_speed}. Right now, it is {current_temp} degrees.")
-            weather.append(f". Right now in {config.loc_city} {config.loc_region}, it is {current_temp} degrees and {current_condition}. Later today, it will be {forecast_condition}, with a high of {forecast_temp_high} degrees and a low of {forecast_temp_low} degrees.")
-            weather.append(f". Here's your local weather. The temperature in {config.loc_city} {config.loc_region} right now, is {current_temp} degrees. The high today will be {forecast_temp_high} degrees, and look for a low of around {forecast_temp_low}. Winds will be {forecast_wind}{wind_speed}.")
-            weather.append(f". Moving to the weather. It is currently {current_condition} in {config.loc_city} {config.loc_region}. Later today it will be {forecast_condition}, with an average temperature of {forecast_temp_avg} degrees, and wind speeds around {forecast_wind}{wind_speed}.")
+            weather.append(f". And now for some weather. Today, it will be {forecast_condition}, with a temperature of {forecast_temp_high} degrees, and wind speeds around {forecast_wind}{wind_speed}.")
+            weather.append(f". Later today, it will be {forecast_condition}, with a high of {forecast_temp_high} degrees and a low of {forecast_temp_low} degrees.")
+            weather.append(f". Here's your local weather. The high today will be {forecast_temp_high} degrees, and look for a low of around {forecast_temp_low}. Winds will be {forecast_wind}{wind_speed}.")
+            weather.append(f". Later today it will be {forecast_condition}, with an average temperature of {forecast_temp_avg} degrees, and wind speeds around {forecast_wind}{wind_speed}.")
             return(random.choice(weather))
 
         # At random times, Vector will see a face and announce something about the weather
@@ -380,7 +383,7 @@ def get_news():
     bridge = [". And in other news. ", ". In OTHER news... ", ". Taking a look at other news. ", ". Here is another news item. ", ". Here is an interesting story. "]
     news = ""
     news_count = config.news_count
-    feed = feedparser.parse("https://www.cbsnews.com/latest/rss/world")
+    feed = feedparser.parse(config.news_feed)
     for post in feed.entries:
         news = news + post.description
         say_count += 1
@@ -448,7 +451,9 @@ def on_wake_word(robot, event_type, event):
         else:
             if j['type'] in valid_response:
                 print("valid response")
-                reaction = random.choices(["joke_intro", "fact_intro", "time_intro", "random_weather", "last_saw_name"])
+                #took out the time, you can already ask for that.
+                #taking out last_saw_name until I check to see if he has seen a face he knows.
+                reaction = random.choices(["joke_intro", "fact_intro", "random_weather"])
                 print(reaction)
                 say(reaction[0])
 
